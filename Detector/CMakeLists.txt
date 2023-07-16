@@ -1,0 +1,4 @@
+add_subdirectory(SCEPCAL)
+add_subdirectory(SCEPCALsensitive)
+add_subdirectory(SCEPCALsegmentation)
+add_subdirectory(SCEPCALcomponents)

@@ -1,0 +1,4 @@
+.idea
+build.nix
+*.root
+result
