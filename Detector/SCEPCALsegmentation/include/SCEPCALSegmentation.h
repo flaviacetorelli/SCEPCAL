@@ -19,6 +19,7 @@ class SCEPCALSegmentation : public Segmentation {
             virtual ~SCEPCALSegmentation() override;
 
             virtual Vector3D position(const CellID& aCellID) const;
+            virtual Vector3D myPosition(const CellID& aCellID);
 
             virtual CellID cellID(const Vector3D& aLocalPosition, const Vector3D& aGlobalPosition,
                                   const VolumeID& aVolumeID) const;
@@ -80,7 +81,7 @@ class SCEPCALSegmentation : public Segmentation {
             std::string fModule;
 
         private:
-
+            std::unordered_map<int, Vector3D> fPositionOf;
         };
     }
 }

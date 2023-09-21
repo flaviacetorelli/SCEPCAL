@@ -41,40 +41,51 @@ namespace DDSegmentation {
         SCEPCALSegmentation::~SCEPCALSegmentation() {}
 
         Vector3D SCEPCALSegmentation::position(const CellID& cID) const {
-
-          int nEta_in = Eta(cID);
-          int nPhi_in = Phi(cID);
-          int nDepth_in = Depth(cID);
-
-          double EBz = 2.0;
-          double Rin = 1.5;
-          double nomfw = 0.1;
-          double Fdz = 0.05;
-          double Rdz = 0.15;
-
-          int nThetaBarrel=floor(EBz/nomfw);
-          int nThetaEndcap=floor(Rin/nomfw);
-          int nPhi=std::floor(2*M_PI*Rin/nomfw);
-
-          double dTheta=(M_PI/2)/(nThetaBarrel+nThetaEndcap);
-          double dPhi=2*M_PI/nPhi;
+          return Vector3D(0,0,0);
+        };
 
 
-          int nTheta = nEta_in>0? (nThetaBarrel+nThetaEndcap)-nEta_in : (nThetaBarrel+nThetaEndcap)-nEta_in;
-          double thC = nTheta*dTheta;
-          double phi = nPhi_in*dPhi;
+      Vector3D SCEPCALSegmentation::myPosition(const CellID& cID) {
 
-          double r0=EBz/cos(thC);
-          double r1=r0+Fdz;
-          double r2=r1+Rdz;
+          int copyNum = (int)cID;
 
-          double R = nDepth_in==1? (r0+r1)/2:(r1+r2)/2;
-          double x = R*sin(thC)*cos(phi);
-          double y = R*sin(thC)*sin(phi);
-          double z = R*cos(thC);
+          if (fPositionOf.count(copyNum) == 0) { //Add if not found
+            int system=(copyNum)&(32-1);
+            int nEta_in=(copyNum>>5)&(1024-1);
+            int nPhi_in=(copyNum>>15)&(1024-1);
+            int nDepth_in=(copyNum>>25)&(8-1);
 
-          return Vector3D(x,y,z);
+            double EBz=2.0;
+            double Rin=1.5;
+            double nomfw=0.1;
+            double Fdz=0.05;
+            double Rdz=0.15;
 
+            int nThetaBarrel=floor(EBz/nomfw);
+            int nThetaEndcap=floor(Rin/nomfw);
+            int nPhi=std::floor(2*M_PI*Rin/nomfw);
+
+            double dTheta=(M_PI/2)/(nThetaBarrel+nThetaEndcap);
+            double dPhi=2*M_PI/nPhi;
+
+            int nTheta=nEta_in>0 ? (nThetaBarrel+nThetaEndcap)-nEta_in : (nThetaBarrel+nThetaEndcap)-nEta_in;
+            double thC=nTheta*dTheta;
+            double phi=nPhi_in*dPhi;
+
+            double r0=EBz/cos(thC);
+            double r1=r0+Fdz;
+            double r2=r1+Rdz;
+
+            double R=nDepth_in==1 ? (r0+r1)/2 : (r1+r2)/2;
+            double x=R*sin(thC)*cos(phi);
+            double y=R*sin(thC)*sin(phi);
+            double z=R*cos(thC);
+
+            Vector3D position(x, y, z);
+            fPositionOf.emplace(copyNum,position);
+          }
+
+          return fPositionOf.at(copyNum);
         }
 
 /*

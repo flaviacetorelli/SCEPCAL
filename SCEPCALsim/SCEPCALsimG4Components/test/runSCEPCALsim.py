@@ -7,9 +7,9 @@ dataservice = k4DataSvc("EventDataSvc")
 
 from Configurables import GenAlg, MomentumRangeParticleGun
 pgun = MomentumRangeParticleGun("PGun",
-  PdgCodes=[11], # electron
-  MomentumMin = 20.*units.GeV, # GeV
-  MomentumMax = 20.*units.GeV, # GeV
+  PdgCodes=[111], # electron
+  MomentumMin = 100.*units.GeV, # GeV
+  MomentumMax = 100.*units.GeV, # GeV
   ThetaMin = 0.1, # rad
   ThetaMax = 3.1, # rad
   PhiMin = 0.0, # rad
@@ -68,7 +68,7 @@ geantsim = SimG4Alg("SimG4Alg",
 )
 
 from Configurables import PodioOutput
-podiooutput = PodioOutput("PodioOutput", filename = "scepcal_test.root")
+podiooutput = PodioOutput("PodioOutput", filename = "scepcal_test2.root")
 podiooutput.outputCommands = ["keep *"]
 
 from Configurables import RndmGenSvc, HepRndm__Engine_CLHEP__RanluxEngine_

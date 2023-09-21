@@ -122,7 +122,7 @@ void SimG4SCEPCALSteppingAction::SteppingAction(const G4Step*         step,
     return;
   }
 
-  if (edep>m_thres) {
+/*  if (edep>m_thres) {
     auto simEdep3d=m_Edeps3d->create();
     auto &pos=preStepPoint->GetPosition();
 
@@ -137,6 +137,7 @@ void SimG4SCEPCALSteppingAction::SteppingAction(const G4Step*         step,
                            static_cast<float>(pos.y()*CLHEP::millimeter),
                            static_cast<float>(pos.z()*CLHEP::millimeter)});
   }
+  */
   accumulate(fPrevTower, copyNum64, edep);
 }
 
@@ -175,9 +176,9 @@ void SimG4SCEPCALSteppingAction::accumulate(unsigned int                    &pre
     simEdep.setCellID( static_cast<unsigned long long>(copyNum64) );
     simEdep.setEnergy(0.); // added later
 
-    auto pos = pSeg->position(copyNum64);
 
-    if (fDebugLevel<2) {
+
+    if (fDebugLevel<6) {
       std::cout << "        Accumulate Position: x: "<<pos.x()*CLHEP::millimeter<<" y: "<<pos.y()*CLHEP::millimeter<<" z: "<< pos.z()*CLHEP::millimeter <<std::endl;
     }
 
@@ -231,16 +232,15 @@ void SimG4SCEPCALSteppingAction::accumulateCherenkov(unsigned int               
     simEdepCherenkov.setCellID( static_cast<unsigned long long>(copyNum64) );
     simEdepCherenkov.setEnergy(0.); // added later
 
-    auto pos = pSeg->position(copyNum64);
+    auto pos = pSeg->myPosition(copyNum64);
 
     if (fDebugLevel<2) {
       std::cout << "            Accumulate Cherenkov Position: x: "<<pos.x()*CLHEP::millimeter<<" y: "<<pos.y()*CLHEP::millimeter<<" z: "<< pos.z()*CLHEP::millimeter <<std::endl;
-      std::cout << "            Accumulate Cherenkov Position: x: "<<pos.x()*CLHEP::millimeter/dd4hep::millimeter<<" y: "<<pos.y()*CLHEP::millimeter/dd4hep::millimeter<<" z: "<< pos.z()*CLHEP::millimeter/dd4hep::millimeter <<std::endl;
     }
 
-    simEdepCherenkov.setPosition( { static_cast<float>(pos.x()*CLHEP::millimeter/dd4hep::millimeter),
-                                    static_cast<float>(pos.y()*CLHEP::millimeter/dd4hep::millimeter),
-                                    static_cast<float>(pos.z()*CLHEP::millimeter/dd4hep::millimeter) } );
+    simEdepCherenkov.setPosition( { static_cast<float>(pos.x()*CLHEP::millimeter),
+                                    static_cast<float>(pos.y()*CLHEP::millimeter),
+                                    static_cast<float>(pos.z()*CLHEP::millimeter) } );
     prev = m_EdepsCherenkov->size();
     thePtr = &simEdepCherenkov;
   }

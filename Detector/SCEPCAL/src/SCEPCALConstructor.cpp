@@ -44,44 +44,50 @@ namespace ddSCEPCAL {
 
       dd4hep::Assembly experimentalHall("hall");
 
-      const double Fdz=crystalFXML.attr<double>(_Unicode(length));
-      const double Rdz=crystalRXML.attr<double>(_Unicode(length));
-      const double nomfw =dimXML.attr<double>(_Unicode(towerFaceWidthNominal));
-      const double nomfwT=dimXML.attr<double>(_Unicode(crystalFaceWidthNominal));
-      const double EBz=dimXML.attr<double>(_Unicode(barrelHalfZ));
-      const double Rin=dimXML.attr<double>(_Unicode(barrelInnerR));
-      const double cube=towerAssemblyXML.attr<double>(_Unicode(cube));
+      const double Fdz    =crystalFXML.attr<double>(_Unicode(length));
+      const double Rdz    =crystalRXML.attr<double>(_Unicode(length));
+      const double nomfw  =dimXML.attr<double>(_Unicode(towerFaceWidthNominal));
+      const double nomfwT =dimXML.attr<double>(_Unicode(crystalFaceWidthNominal));
+      const double EBz    =dimXML.attr<double>(_Unicode(barrelHalfZ));
+      const double Rin    =dimXML.attr<double>(_Unicode(barrelInnerR));
+      const double cube   =towerAssemblyXML.attr<double>(_Unicode(cube));
 
-      dd4hep::Material crystalFMat=theDetector.material(crystalFXML.materialStr());
-      dd4hep::Material crystalRMat=theDetector.material(crystalRXML.materialStr());
-      dd4hep::Material timingMat=theDetector.material(timingXML.materialStr());
-      dd4hep::Material instMat=theDetector.material(instXML.materialStr());
+      dd4hep::Material crystalFMat =theDetector.material(crystalFXML.materialStr());
+      dd4hep::Material crystalRMat =theDetector.material(crystalRXML.materialStr());
+      dd4hep::Material timingMat   =theDetector.material(timingXML.materialStr());
+      dd4hep::Material instMat     =theDetector.material(instXML.materialStr());
 
-      int nThetaBarrel=floor(EBz/nomfw);
-      int nThetaEndcap=floor(Rin/nomfw);
-      int nPhi=std::floor(2*M_PI*Rin/nomfw);
+      int nThetaBarrel  =floor(EBz/nomfw);
+      int nThetaEndcap  =floor(Rin/nomfw);
 
-      double dTheta=(M_PI/2)/(nThetaBarrel+nThetaEndcap);
-      double dPhi=2*M_PI/nPhi;
+      double thetaSizeEndcap=arctan(Rin/EBz);
+
+      double dThetaBarrel =(M_PI/2-thetaSizeEndcap)/(nThetaBarrel);
+      double dThetaEndcap =thetaSizeEndcap/nThetaEndcap;
+
+      int    nPhiBarrel   =floor(2*M_PI*Rin/nomfw);
+      double dPhiBarrel   =2*M_PI/nPhiBarrel;
 
       for (int iTheta=0; iTheta<2*nThetaBarrel+1; iTheta++) {
 
-        double thC=iTheta*dTheta+dTheta*nThetaEndcap;
+        double thC =thetaSizeEndcap+(iTheta*dThetaBarrel);
 
-        double r0=Rin/sin(thC);
-        double r1=r0+Fdz;
-        double r2=r1+Rdz;
+        double r0 =Rin/sin(thC);
+        double r1 =r0+Fdz;
+        double r2 =r1+Rdz;
 
-        double y0=r0*tan(dTheta/2.);
-        double y1=r1*tan(dTheta/2.);
-        double y2=r2*tan(dTheta/2.);
+        double y0 =r0*tan(dThetaBarrel/2.);
+        double y1 =r1*tan(dThetaBarrel/2.);
+        double y2 =r2*tan(dThetaBarrel/2.);
 
-        double x0y0 = (r0*cos(thC) +y0*sin(thC)) *tan(thC -dTheta/2.) *tan(dPhi/2.);
-        double x1y0 = (r0*cos(thC) -y0*sin(thC)) *tan(thC +dTheta/2.) *tan(dPhi/2.);
-        double x0y1 = (r1*cos(thC) +y1*sin(thC)) *tan(thC -dTheta/2.) *tan(dPhi/2.);
-        double x1y1 = (r1*cos(thC) -y1*sin(thC)) *tan(thC +dTheta/2.) *tan(dPhi/2.);
-        double x0y2 = (r2*cos(thC) +y2*sin(thC)) *tan(thC -dTheta/2.) *tan(dPhi/2.);
-        double x1y2 = (r2*cos(thC) -y2*sin(thC)) *tan(thC +dTheta/2.) *tan(dPhi/2.);
+        double x0y0 = (r0*cos(thC) +y0*sin(thC)) *tan(thC -dThetaBarrel/2.) *tan(dPhiBarrel/2.);
+        double x1y0 = (r0*cos(thC) -y0*sin(thC)) *tan(thC +dThetaBarrel/2.) *tan(dPhiBarrel/2.);
+
+        double x0y1 = (r1*cos(thC) +y1*sin(thC)) *tan(thC -dThetaBarrel/2.) *tan(dPhiBarrel/2.);
+        double x1y1 = (r1*cos(thC) -y1*sin(thC)) *tan(thC +dThetaBarrel/2.) *tan(dPhiBarrel/2.);
+
+        double x0y2 = (r2*cos(thC) +y2*sin(thC)) *tan(thC -dThetaBarrel/2.) *tan(dPhiBarrel/2.);
+        double x1y2 = (r2*cos(thC) -y2*sin(thC)) *tan(thC +dThetaBarrel/2.) *tan(dPhiBarrel/2.);
 
         double verticesF[]={x0y0,y0,x1y0,-y0,-x1y0,-y0,-x0y0,y0,
                             x0y1,y1,x1y1,-y1,-x1y1,-y1,-x0y1,y1};
@@ -157,7 +163,7 @@ namespace ddSCEPCAL {
 
         dd4hep::Box towerAssemblyBox(cube,cube,cube);
 
-        for (int iPhi=0; iPhi<nPhi; iPhi++) {
+        for (int iPhi=0; iPhi<nPhiBarrel; iPhi++) {
 
           auto crystalFId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1), iPhi, 1);
           auto crystalRId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1), iPhi, 2);
@@ -165,12 +171,11 @@ namespace ddSCEPCAL {
           int crystalFId32=segmentation->getFirst32bits(crystalFId64);
           int crystalRId32=segmentation->getFirst32bits(crystalRId64);
 
-
           dd4hep::Volume towerAssemblyVol("towerAssemblyVol", towerAssemblyShapeBarrel, theDetector.material("Vacuum"));
           towerAssemblyVol.setVisAttributes(theDetector, towerAssemblyXML.visStr());
 
           double rt=r0+(Fdz+Rdz)/2.;
-          double phi=iPhi*dPhi;
+          double phi=iPhi*dPhiBarrel;
 
           RotationZYX rot(M_PI/2, thC, 0);
           ROOT::Math::RotationZ rotZ = ROOT::Math::RotationZ(phi);
@@ -217,49 +222,44 @@ namespace ddSCEPCAL {
         }
       }
 
-      for (int iTheta=0; iTheta<nThetaEndcap; iTheta++) {
-        if (abs(iTheta)<2) continue;
+      for (int iTheta=1; iTheta<nThetaEndcap; iTheta++) {
 
-        double thC=iTheta*dTheta;
+        double thC        =iTheta*dThetaEndcap;
+        double RinEndcap  = EBz*tan(thC);
 
-        double r0=EBz/cos(thC);
-        double y0=r0*tan(dTheta/2.);
+        int    nPhiEndcap =floor(2*M_PI*RinEndcap/nomfw);
+        double dPhiEndcap =2*M_PI/nPhiEndcap;
 
+//        double r0=EBz/cos(thC);
+        double r0=RinEndcap/sin(thC);
         double r1=r0+Fdz;
-        double y1=r1*tan(dTheta/2.);
-
         double r2=r1+Rdz;
-        double y2=r2*tan(dTheta/2.);
 
-        double verticesF[]={(r0*cos(thC)+y0*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y0,
-                            (r0*cos(thC)-y0*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y0,
-                           -(r0*cos(thC)-y0*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y0,
-                           -(r0*cos(thC)+y0*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y0,
+        double y0=r0*tan(dThetaEndcap/2.);
+        double y1=r1*tan(dThetaEndcap/2.);
+        double y2=r2*tan(dThetaEndcap/2.);
 
-                            (r1*cos(thC)+y1*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y1,
-                            (r1*cos(thC)-y1*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y1,
-                           -(r1*cos(thC)-y1*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y1,
-                           -(r1*cos(thC)+y1*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y1};
+        double centralHalfWidthActual = RinEndcap*sin(dPhiEndcap/2);
 
-        double verticesR[]={(r1*cos(thC)+y1*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y1,
-                            (r1*cos(thC)-y1*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y1,
-                           -(r1*cos(thC)-y1*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y1,
-                           -(r1*cos(thC)+y1*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y1,
+        if (abs(1-y0/centralHalfWidthActual)>0.15) {continue;}
 
-                            (r2*cos(thC)+y2*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y2,
-                            (r2*cos(thC)-y2*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y2,
-                           -(r2*cos(thC)-y2*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y2,
-                           -(r2*cos(thC)+y2*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y2};
+        double x0y0 = (r0*cos(thC) +y0*sin(thC)) *tan(thC -dThetaEndcap/2.) *tan(dPhiEndcap/2.);
+        double x1y0 = (r0*cos(thC) -y0*sin(thC)) *tan(thC +dThetaEndcap/2.) *tan(dPhiEndcap/2.);
 
-        double verticesA[]={(r0*cos(thC)+y0*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y0,
-                            (r0*cos(thC)-y0*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y0,
-                           -(r0*cos(thC)-y0*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y0,
-                           -(r0*cos(thC)+y0*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y0,
+        double x0y1 = (r1*cos(thC) +y1*sin(thC)) *tan(thC -dThetaEndcap/2.) *tan(dPhiEndcap/2.);
+        double x1y1 = (r1*cos(thC) -y1*sin(thC)) *tan(thC +dThetaEndcap/2.) *tan(dPhiEndcap/2.);
 
-                            (r2*cos(thC)+y2*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y2,
-                            (r2*cos(thC)-y2*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y2,
-                           -(r2*cos(thC)-y2*sin(thC))*tan(thC+dTheta/2.)*tan(dPhi/2.),-y2,
-                           -(r2*cos(thC)+y2*sin(thC))*tan(thC-dTheta/2.)*tan(dPhi/2.), y2};
+        double x0y2 = (r2*cos(thC) +y2*sin(thC)) *tan(thC -dThetaEndcap/2.) *tan(dPhiEndcap/2.);
+        double x1y2 = (r2*cos(thC) -y2*sin(thC)) *tan(thC +dThetaEndcap/2.) *tan(dPhiEndcap/2.);
+
+        double verticesF[]={x0y0,y0,x1y0,-y0,-x1y0,-y0,-x0y0,y0,
+                            x0y1,y1,x1y1,-y1,-x1y1,-y1,-x0y1,y1};
+
+        double verticesR[]={x0y1,y1,x1y1,-y1,-x1y1,-y1,-x0y1,y1,
+                            x0y2,y2,x1y2,-y2,-x1y2,-y2,-x0y2,y2};
+
+        double verticesA[]={x0y0,y0,x1y0,-y0,-x1y0,-y0,-x0y0,y0,
+                            x0y2,y2,x1y2,-y2,-x1y2,-y2,-x0y2,y2};
 
 
         dd4hep::EightPointSolid crystalFShape(Fdz/2, verticesF);

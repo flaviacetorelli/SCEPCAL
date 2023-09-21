@@ -952,7 +952,7 @@
 
       <sensitive type="SCEPCALSiPMSD"/>
 
-      <dim    barrelHalfZ="2*m" barrelInnerR="1.5*m" crystalFaceWidthNominal="50*mm" towerFaceWidthNominal="100*mm" />
+      <dim    barrelHalfZ="2*m" barrelInnerR="1.5*m" crystalFaceWidthNominal="50*mm" towerFaceWidthNominal="50*mm" />
 
       <crystalF       length="50*mm"      material="PbWO"          vis="crystalFVis"/>
       <crystalR       length="150*mm"     material="PbWO"          vis="crystalRVis"/>
