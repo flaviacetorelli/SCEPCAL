@@ -60,7 +60,7 @@ namespace ddSCEPCAL {
       int nThetaBarrel  =floor(EBz/nomfw);
       int nThetaEndcap  =floor(Rin/nomfw);
 
-      double thetaSizeEndcap=arctan(Rin/EBz);
+      double thetaSizeEndcap=atan(Rin/EBz);
 
       double dThetaBarrel =(M_PI/2-thetaSizeEndcap)/(nThetaBarrel);
       double dThetaEndcap =thetaSizeEndcap/nThetaEndcap;
@@ -274,7 +274,7 @@ namespace ddSCEPCAL {
 
         dd4hep::Box towerAssemblyBoxEndcap(cube,cube,cube);
 
-        for (int iPhi=0; iPhi<nPhi; iPhi++) {
+        for (int iPhi=0; iPhi<nPhiEndcap; iPhi++) {
 
           auto crystalFId64=segmentation->setVolumeID(1,(nThetaBarrel+nThetaEndcap-iTheta), iPhi, 1);
           auto crystalRId64=segmentation->setVolumeID(1,(nThetaBarrel+nThetaEndcap-iTheta), iPhi, 2);
@@ -292,7 +292,7 @@ namespace ddSCEPCAL {
           towerAssemblyVolEndcap1.setVisAttributes(theDetector, towerAssemblyXML.visStr());
 
           double rt=r0+(Fdz+Rdz)/2.;
-          double phi=iPhi*dPhi;
+          double phi=iPhi*dPhiEndcap;
 
           ROOT::Math::RotationZ rotZ = ROOT::Math::RotationZ(phi);
 

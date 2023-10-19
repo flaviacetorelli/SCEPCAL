@@ -172,6 +172,7 @@ void SimG4SCEPCALSteppingAction::accumulate(unsigned int                    &pre
   if (!found) { // create
     if (fDebugLevel<2) std::cout<<"        Accumulate create: "<<std::endl;
 
+    auto pos = pSeg->myPosition(copyNum64);
     auto simEdep = m_Edeps->create();
     simEdep.setCellID( static_cast<unsigned long long>(copyNum64) );
     simEdep.setEnergy(0.); // added later
