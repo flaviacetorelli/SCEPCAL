@@ -34,7 +34,7 @@ from Configurables import GeoSvc
 geoservice = GeoSvc(
   "GeoSvc",
   detectors = [
-    'file:/home/wonyongc/src/hep/SCEPCAL/Detector/SCEPCAL/compact/SCEPCAL.xml'
+    'file:/afs/cern.ch/user/w/wochung/private/CalVision/SCEPCAL/install/share/compact/SCEPCAL.xml'
   ]
 )
 
@@ -68,7 +68,7 @@ geantsim = SimG4Alg("SimG4Alg",
 )
 
 from Configurables import PodioOutput
-podiooutput = PodioOutput("PodioOutput", filename = "scepcal_test2.root")
+podiooutput = PodioOutput("PodioOutput", filename = "scepcal_lxplus.root")
 podiooutput.outputCommands = ["keep *"]
 
 from Configurables import RndmGenSvc, HepRndm__Engine_CLHEP__RanluxEngine_

@@ -13,6 +13,7 @@ namespace drc {
 SimG4SCEPCALSteppingAction::SimG4SCEPCALSteppingAction()
 : G4UserSteppingAction(), fPrevTower(0), fPrevTowerCherenkov(0), fDebugLevel(5), fCounter(0) {}
 
+
 SimG4SCEPCALSteppingAction::~SimG4SCEPCALSteppingAction() {}
 
 void SimG4SCEPCALSteppingAction::UserSteppingAction(const G4Step* step) {
@@ -128,7 +129,10 @@ void SimG4SCEPCALSteppingAction::SteppingAction(const G4Step*         step,
 
     if (fDebugLevel<2) {
       std::cout << "    SteppingAction edep: "<< edep << std::endl;
-      std::cout << "    SteppingAction Position: x: "<<pos.x()*CLHEP::millimeter<<" y: "<<pos.y()*CLHEP::millimeter<<" z: "<< pos.z()*CLHEP::millimeter <<std::endl;
+      std::cout << "    SteppingAction Position: x: "<<pos.x()*CLHEP::millimeter
+                << " y: "<<pos.y()*CLHEP::millimeter
+                << " z: "<<pos.z()*CLHEP::millimeter
+                << std::endl;
     }
 
     simEdep3d.setCellID(static_cast<unsigned long long>(copyNum64));
@@ -177,9 +181,13 @@ void SimG4SCEPCALSteppingAction::accumulate(unsigned int                    &pre
     simEdep.setEnergy(0.); // added later
 
 
+    auto pos = pSeg->myPosition(copyNum64);
 
     if (fDebugLevel<6) {
-      std::cout << "        Accumulate Position: x: "<<pos.x()*CLHEP::millimeter<<" y: "<<pos.y()*CLHEP::millimeter<<" z: "<< pos.z()*CLHEP::millimeter <<std::endl;
+      std::cout << "        Accumulate Position: x: "<<pos.x()*CLHEP::millimeter
+                << " y: "<<pos.y()*CLHEP::millimeter
+                << " z: "<<pos.z()*CLHEP::millimeter
+                << std::endl;
     }
 
     simEdep.setPosition( { static_cast<float>(pos.x()*CLHEP::millimeter),
@@ -235,7 +243,10 @@ void SimG4SCEPCALSteppingAction::accumulateCherenkov(unsigned int               
     auto pos = pSeg->myPosition(copyNum64);
 
     if (fDebugLevel<2) {
-      std::cout << "            Accumulate Cherenkov Position: x: "<<pos.x()*CLHEP::millimeter<<" y: "<<pos.y()*CLHEP::millimeter<<" z: "<< pos.z()*CLHEP::millimeter <<std::endl;
+      std::cout << "            Accumulate Cherenkov Position: x: "<<pos.x()*CLHEP::millimeter
+                << " y: "<<pos.y()*CLHEP::millimeter
+                << " z: "<<pos.z()*CLHEP::millimeter
+                << std::endl;
     }
 
     simEdepCherenkov.setPosition( { static_cast<float>(pos.x()*CLHEP::millimeter),
@@ -249,7 +260,10 @@ void SimG4SCEPCALSteppingAction::accumulateCherenkov(unsigned int               
   thePtr->setEnergy( edepPrev + 1 );
 
   if (fDebugLevel<2) {
-    std::cout << "            Accumulate Cherenkov cellID: "<< thePtr->getCellID() << " counts: " << thePtr->getEnergy() << std::endl;
+    std::cout << "            Accumulate Cherenkov cellID: "
+              << thePtr->getCellID() 
+              << " counts: " << thePtr->getEnergy() 
+              << std::endl;
   }
 }
 
@@ -262,7 +276,10 @@ void SimG4SCEPCALSteppingAction::saveLeakage(G4Track* track,
                                              G4StepPoint* preStepPoint) {
   if (fDebugLevel<2) {
     std::cout<<"Leakage particle: "<<std::endl;
-    std::cout<<"Leakage position x: "<<preStepPoint->GetPosition().x()*CLHEP::millimeter<<" y: "<<preStepPoint->GetPosition().y()*CLHEP::millimeter<<" z: "<< preStepPoint->GetPosition().z()*CLHEP::millimeter <<std::endl;
+    std::cout<<"Leakage position x: "<<preStepPoint->GetPosition().x()*CLHEP::millimeter
+             <<" y: "<<preStepPoint->GetPosition().y()*CLHEP::millimeter
+             <<" z: "<<preStepPoint->GetPosition().z()*CLHEP::millimeter
+             << std::endl;
   }
 
   auto leakage = m_Leakages->create();

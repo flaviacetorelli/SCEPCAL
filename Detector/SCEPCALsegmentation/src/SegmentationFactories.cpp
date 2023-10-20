@@ -12,4 +12,4 @@ namespace {
 }
 
 #include "SCEPCALSegmentation.h"
-DECLARE_SEGMENTATION(SCEPCALSegmentation, create_segmentation<dd4hep::DDSegmentation::SCEPCALSegmentation>
+DECLARE_SEGMENTATION(SCEPCALSegmentation, create_segmentation<dd4hep::DDSegmentation::SCEPCALSegmentation>)
