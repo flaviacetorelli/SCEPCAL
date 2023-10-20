@@ -68,3 +68,21 @@ geantsim = SimG4Alg("SimG4Alg",
 Optical physics is NOT simulated by the `GEANT4` default physics list due to extensive compute, it is turned on separately in `SimG4OpticalPhysicsList` and the Cherenkov and scillation processes are configured, however in `SimG4SCEPCALSteppingAction` Cherenkov photons are killed on the first step after being counted.
 
 `SimG4SCEPCALoActions` is responsible for initializing `SimG4SCEPCALSteppingAction`, which retrieves MC truth energy deposits inside each cell. The resulting MC-truth energy deposit and counted number of photoelectrons are stored separate `edm4hep` collections of type `SimCalorimeterHits`.
+
+### Running on Condor
+
+Adjust the files `SCEPCALsim.sh` and `SCEPCALsim.sub` to your configuration and then
+
+```
+condor_submit SCEPCALsim.sub
+```
+
+on lxplus. Note that the shell file sources a `SCEPCALenv.sh` file created by you to get the env variables to be able to use your local installation.
+
+```
+cd install/test
+env | sed -e 's/^/export\ /' > SCEPCALenv.sh
+chmod +x SCEPCALenv.sh
+```
+
+This will write your current environment to file, appending the string "export " at the beginning of each line to make it sourceable. This should be run in the same login session as when you ran `init_lcg.sh`. Since all environment variables, including ones irrelevant to the simulation, are printed by `env`, it is recommended to read through the generated file and remove env variables that are unneeded.

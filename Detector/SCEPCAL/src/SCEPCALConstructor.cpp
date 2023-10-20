@@ -24,10 +24,12 @@ namespace ddSCEPCAL {
     static dd4hep::Ref_t
     create_detector(dd4hep::Detector &theDetector, xml_h xmlElement, dd4hep::SensitiveDetector sensDet) {
 
+      // Initialize detector element
       xml_det_t detectorXML=xmlElement;
       std::string name=detectorXML.nameStr();
       dd4hep::DetElement drDet(name, detectorXML.id());
 
+      // Import xml objects from compact xml
       dd4hep::xml::Dimension sensDetType=detectorXML.child(_Unicode(sensitive));
       xml_comp_t dimXML=detectorXML.child(_Unicode(dim));
       xml_comp_t crystalFXML=detectorXML.child(_Unicode(crystalF));
@@ -40,10 +42,12 @@ namespace ddSCEPCAL {
 
       sensDet.setType(sensDetType.typeStr());
 
+      // Set the segmentation class
       auto segmentation=dynamic_cast<dd4hep::DDSegmentation::SCEPCALSegmentation *>( sensDet.readout().segmentation().segmentation());
 
       dd4hep::Assembly experimentalHall("hall");
 
+      // Parse input parameters from imported xml objects
       const double Fdz    =crystalFXML.attr<double>(_Unicode(length));
       const double Rdz    =crystalRXML.attr<double>(_Unicode(length));
       const double nomfw  =dimXML.attr<double>(_Unicode(towerFaceWidthNominal));
@@ -52,11 +56,13 @@ namespace ddSCEPCAL {
       const double Rin    =dimXML.attr<double>(_Unicode(barrelInnerR));
       const double cube   =towerAssemblyXML.attr<double>(_Unicode(cube));
 
+      // Material definitions
       dd4hep::Material crystalFMat =theDetector.material(crystalFXML.materialStr());
       dd4hep::Material crystalRMat =theDetector.material(crystalRXML.materialStr());
       dd4hep::Material timingMat   =theDetector.material(timingXML.materialStr());
       dd4hep::Material instMat     =theDetector.material(instXML.materialStr());
 
+      // Begin geometry calculations
       int nThetaBarrel  =floor(EBz/nomfw);
       int nThetaEndcap  =floor(Rin/nomfw);
 
@@ -68,9 +74,12 @@ namespace ddSCEPCAL {
       int    nPhiBarrel   =floor(2*M_PI*Rin/nomfw);
       double dPhiBarrel   =2*M_PI/nPhiBarrel;
 
+      // Make towers along theta (eta) and make rotations in phi each step (i.e. phi nested in theta)
       for (int iTheta=0; iTheta<2*nThetaBarrel+1; iTheta++) {
 
         double thC =thetaSizeEndcap+(iTheta*dThetaBarrel);
+
+        // Projective towers using EightPointSolids. see: https://root.cern.ch/doc/master/classTGeoArb8.html
 
         double r0 =Rin/sin(thC);
         double r1 =r0+Fdz;
@@ -89,6 +98,8 @@ namespace ddSCEPCAL {
         double x0y2 = (r2*cos(thC) +y2*sin(thC)) *tan(thC -dThetaBarrel/2.) *tan(dPhiBarrel/2.);
         double x1y2 = (r2*cos(thC) -y2*sin(thC)) *tan(thC +dThetaBarrel/2.) *tan(dPhiBarrel/2.);
 
+        // Tower Assembly shape (A) holds Forward (F) and Rear (R) crystal shapes
+
         double verticesF[]={x0y0,y0,x1y0,-y0,-x1y0,-y0,-x0y0,y0,
                             x0y1,y1,x1y1,-y1,-x1y1,-y1,-x0y1,y1};
 
@@ -101,68 +112,15 @@ namespace ddSCEPCAL {
         dd4hep::EightPointSolid crystalFShape(Fdz/2, verticesF);
         dd4hep::EightPointSolid crystalRShape(Rdz/2, verticesR);
         dd4hep::EightPointSolid towerAssemblyShapeBarrel((Fdz+Rdz)/2, verticesA);
-/*
 
-        int nPhiT=
-        int timingDir=iPhi%2-iTheta%2 //Checker pattern
+        // Promote shapes to volumes and set attributes
+        dd4hep::Volume crystalFVol("BarrelCrystalR", crystalFShape, crystalFMat);
+        dd4hep::Volume crystalRVol("BarrelCrystalF", crystalRShape, crystalRMat);
 
-        double x0y0step = 2*x0y0/nPhiT;
+        crystalFVol.setVisAttributes(theDetector, crystalFXML.visStr());
+        crystalRVol.setVisAttributes(theDetector, crystalRXML.visStr());
 
-
-        for (int iPhiT=0; iPhiT<nPhiT; iPhiT++) {
-          for (int iPhiT=0; iPhiT<nPhiT; iPhiT++) {
-
-            double x0y0c = x0y0
-            double x1y0c = x1y0
-            double x0y1c = x0y1
-            double x1y1c = x1y1
-            double x0y2c = x0y2
-            double x1y2c = x1y2
-
-            double verticesF[]={x0y0,y0,x1y0,-y0,-x1y0,-y0,-x0y0,y0,
-                                x0y1,y1,x1y1,-y1,-x1y1,-y1,-x0y1,y1};
-
-            double verticesR[]={x0y1,y1,x1y1,-y1,-x1y1,-y1,-x0y1,y1,
-                                x0y2,y2,x1y2,-y2,-x1y2,-y2,-x0y2,y2};
-
-            double verticesA[]={x0y0,y0,x1y0,-y0,-x1y0,-y0,-x0y0,y0,
-                                x0y2,y2,x1y2,-y2,-x1y2,-y2,-x0y2,y2};
-
-
-          dd4hep::EightPointSolid crystalFShape(Fdz/2, verticesF);
-          dd4hep::EightPointSolid crystalRShape(Rdz/2, verticesR);
-*/
-
-          dd4hep::Volume crystalFVol("BarrelCrystalR", crystalFShape, crystalFMat);
-          dd4hep::Volume crystalRVol("BarrelCrystalF", crystalRShape, crystalRMat);
-
-          crystalFVol.setVisAttributes(theDetector, crystalFXML.visStr());
-          crystalRVol.setVisAttributes(theDetector, crystalRXML.visStr());
-/*
-          auto crystalFId64=segmentation->setVolumeID(1, nThetaBarrel-iTheta, iPhi, 1);
-          auto crystalRId64=segmentation->setVolumeID(1, nThetaBarrel-iTheta, iPhi, 2);
-
-          int crystalFId32=segmentation->getFirst32bits(crystalFId64);
-          int crystalRId32=segmentation->getFirst32bits(crystalRId64);
-
-          dd4hep::PlacedVolume crystalFp=towerAssemblyVol.placeVolume(crystalFVol,crystalFId32,Transform3D(RotationZYX(0,0,thC>M_PI/2?M_PI:0),Position(0,0,(thC>M_PI/2?-1:1)*(r0+Fdz/2))));
-          dd4hep::PlacedVolume crystalRp=towerAssemblyVol.placeVolume(crystalRVol,crystalRId32,Transform3D(RotationZYX(0,0,thC>M_PI/2?M_PI:0),Position(0,0,(thC>M_PI/2?-1:1)*(r1+Rdz/2))));
-
-
-          crystalFp.addPhysVolID("eta", nThetaBarrel-iTheta);
-          crystalFp.addPhysVolID("phi", iPhi);
-          crystalFp.addPhysVolID("depth", 1);
-
-          crystalRp.addPhysVolID("eta", nThetaBarrel-iTheta);
-          crystalRp.addPhysVolID("phi", iPhi);
-          crystalRp.addPhysVolID("depth", 2);
-
-          }
-        }
-*/
-
-        dd4hep::Box towerAssemblyBox(cube,cube,cube);
-
+        // Rotations in phi to place volumes
         for (int iPhi=0; iPhi<nPhiBarrel; iPhi++) {
 
           auto crystalFId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1), iPhi, 1);
@@ -177,6 +135,7 @@ namespace ddSCEPCAL {
           double rt=r0+(Fdz+Rdz)/2.;
           double phi=iPhi*dPhiBarrel;
 
+          // Have to use the ROOT rotation class here because Euler rotations are not implemented in dd4hep
           RotationZYX rot(M_PI/2, thC, 0);
           ROOT::Math::RotationZ rotZ = ROOT::Math::RotationZ(phi);
           rot = rotZ*rot;
@@ -187,6 +146,7 @@ namespace ddSCEPCAL {
 
           experimentalHall.placeVolume( towerAssemblyVol, Transform3D(rot,disp) );
 
+          // Place volumes and ID them
           dd4hep::PlacedVolume crystalFp = towerAssemblyVol.placeVolume( crystalFVol, crystalFId32, Position(0,0,-Rdz/2) );
           dd4hep::PlacedVolume crystalRp = towerAssemblyVol.placeVolume( crystalRVol, crystalRId32, Position(0,0,Fdz/2) );
 
@@ -222,15 +182,16 @@ namespace ddSCEPCAL {
         }
       }
 
+      // Endcap
       for (int iTheta=1; iTheta<nThetaEndcap; iTheta++) {
 
         double thC        =iTheta*dThetaEndcap;
         double RinEndcap  = EBz*tan(thC);
 
+        // Same calculations, except nPhiEndcap changes for each theta instead of being constant
         int    nPhiEndcap =floor(2*M_PI*RinEndcap/nomfw);
         double dPhiEndcap =2*M_PI/nPhiEndcap;
 
-//        double r0=EBz/cos(thC);
         double r0=RinEndcap/sin(thC);
         double r1=r0+Fdz;
         double r2=r1+Rdz;
@@ -239,6 +200,7 @@ namespace ddSCEPCAL {
         double y1=r1*tan(dThetaEndcap/2.);
         double y2=r2*tan(dThetaEndcap/2.);
 
+        // Skip crystals at low theta (near the beampipe) if the crystal face aspect ratio is over 15% of unity
         double centralHalfWidthActual = RinEndcap*sin(dPhiEndcap/2);
 
         if (abs(1-y0/centralHalfWidthActual)>0.15) {continue;}
@@ -260,7 +222,6 @@ namespace ddSCEPCAL {
 
         double verticesA[]={x0y0,y0,x1y0,-y0,-x1y0,-y0,-x0y0,y0,
                             x0y2,y2,x1y2,-y2,-x1y2,-y2,-x0y2,y2};
-
 
         dd4hep::EightPointSolid crystalFShape(Fdz/2, verticesF);
         dd4hep::EightPointSolid crystaslRShape(Rdz/2, verticesR);
@@ -374,8 +335,11 @@ namespace ddSCEPCAL {
 
       }
 
+      // Place the detector
+
       dd4hep::PlacedVolume hallPlace=theDetector.pickMotherVolume(drDet).placeVolume(experimentalHall);
-//      hallPlace.addPhysVolID("system", detectorXML.id());
+
+      //hallPlace.addPhysVolID("system", detectorXML.id());
       hallPlace.addPhysVolID("system", 0);
 
       drDet.setPlacement(hallPlace);
