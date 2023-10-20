@@ -8,8 +8,8 @@ dataservice = k4DataSvc("EventDataSvc")
 from Configurables import GenAlg, MomentumRangeParticleGun
 pgun = MomentumRangeParticleGun("PGun",
   PdgCodes=[111], # electron
-  MomentumMin = 100.*units.GeV, # GeV
-  MomentumMax = 100.*units.GeV, # GeV
+  MomentumMin = 20.*units.GeV, # GeV
+  MomentumMax = 20.*units.GeV, # GeV
   ThetaMin = 0.1, # rad
   ThetaMax = 3.1, # rad
   PhiMin = 0.0, # rad

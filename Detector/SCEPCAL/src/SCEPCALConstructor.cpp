@@ -50,8 +50,7 @@ namespace ddSCEPCAL {
       // Parse input parameters from imported xml objects
       const double Fdz    =crystalFXML.attr<double>(_Unicode(length));
       const double Rdz    =crystalRXML.attr<double>(_Unicode(length));
-      const double nomfw  =dimXML.attr<double>(_Unicode(towerFaceWidthNominal));
-      const double nomfwT =dimXML.attr<double>(_Unicode(crystalFaceWidthNominal));
+      const double nomfw  =dimXML.attr<double>(_Unicode(crystalFaceWidthNominal));
       const double EBz    =dimXML.attr<double>(_Unicode(barrelHalfZ));
       const double Rin    =dimXML.attr<double>(_Unicode(barrelInnerR));
       const double cube   =towerAssemblyXML.attr<double>(_Unicode(cube));
