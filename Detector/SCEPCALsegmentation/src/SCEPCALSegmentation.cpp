@@ -51,12 +51,13 @@ namespace DDSegmentation {
 
           if (fPositionOf.count(copyNum) == 0) { //Add if not found
             int system=(copyNum)&(32-1);
-            int nEta_in=(copyNum>>5)&(1024-1);
+            //int nEta_in=(copyNum>>5)&(1024-1);
+            int nEta_in=Eta(copyNum);
             int nPhi_in=(copyNum>>15)&(1024-1);
             int nDepth_in=(copyNum>>25)&(8-1);
 
-            double EBz=2.0;
-            double Rin=1.5;
+            double EBz=2.25;
+            double Rin=2.0;
             double nomfw=0.1;
             double Fdz=0.05;
             double Rdz=0.15;
@@ -68,19 +69,28 @@ namespace DDSegmentation {
             double dTheta=(M_PI/2)/(nThetaBarrel+nThetaEndcap);
             double dPhi=2*M_PI/nPhi;
 
-            int nTheta=nEta_in>0 ? (nThetaBarrel+nThetaEndcap)-nEta_in : (nThetaBarrel+nThetaEndcap)-nEta_in;
+            int nTheta = nEta_in>0 ? (nThetaBarrel+nThetaEndcap)-nEta_in : -((nThetaBarrel+nThetaEndcap)+nEta_in);
+            std::cout << "This is nEta_in :: " << nEta_in << std::endl;
+            std::cout << "So this is nTheta :: " << nTheta << std::endl;
             double thC=nTheta*dTheta;
+
+            std::cout << "So this is thC :: " << nTheta*dTheta << std::endl;
             double phi=nPhi_in*dPhi;
 
             double r0=EBz/cos(thC);
+
             double r1=r0+Fdz;
             double r2=r1+Rdz;
 
             double R=nDepth_in==1 ? (r0+r1)/2 : (r1+r2)/2;
             double x=R*sin(thC)*cos(phi);
             double y=R*sin(thC)*sin(phi);
-            double z=R*cos(thC);
+            double z= thC>0 ? R*cos(thC):-R*cos(thC);
 
+            
+            std::cout << "And finally R :: " << R << std::endl;
+            std::cout << "And finally cos :: " << cos(thC) << std::endl;
+            std::cout << "And finally Z :: " << z << std::endl;
             Vector3D position(x, y, z);
             fPositionOf.emplace(copyNum,position);
           }
@@ -120,6 +130,13 @@ namespace DDSegmentation {
             VolumeID PhiId = static_cast<VolumeID>(Phi);
             VolumeID DepthId = static_cast<VolumeID>(Depth);
             VolumeID vID = 0;
+
+            //std::cout << " In setVolumeID:: " << std::endl;
+            //std::cout << " EtaID:: " << EtaId <<std::endl;
+            //std::cout << " PhiID:: " << PhiId <<std::endl;
+            //std::cout << " DepthID:: " << DepthId <<std::endl;
+
+
             _decoder->set(vID, fSystemId, SystemId);
             _decoder->set(vID, fEtaId, EtaId);
             _decoder->set(vID, fPhiId, PhiId);
@@ -132,11 +149,19 @@ namespace DDSegmentation {
         }
 
         CellID SCEPCALSegmentation::setCellID(int System, int Eta, int Phi, int Depth) const {
-          VolumeID SystemId = static_cast<VolumeID>(System);
-          VolumeID EtaId = static_cast<VolumeID>(Eta);
+            VolumeID SystemId = static_cast<VolumeID>(System);
+            VolumeID EtaId = static_cast<VolumeID>(Eta);
             VolumeID PhiId = static_cast<VolumeID>(Phi);
             VolumeID DepthId = static_cast<VolumeID>(Depth);
             VolumeID vID = 0;
+
+            //std::cout << " In setCellID:: " << std::endl;
+            //std::cout << " EtaID:: " << EtaId <<std::endl;
+            //std::cout << " PhiID:: " << PhiId <<std::endl;
+            //std::cout << " DepthID:: " << DepthId <<std::endl;
+
+
+
             _decoder->set(vID, fSystemId, SystemId);
             _decoder->set(vID, fEtaId, EtaId);
             _decoder->set(vID, fPhiId, PhiId);

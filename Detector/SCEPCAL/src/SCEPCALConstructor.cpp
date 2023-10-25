@@ -74,8 +74,8 @@ namespace ddSCEPCAL {
       double dPhiBarrel   =2*M_PI/nPhiBarrel;
 
       // Make towers along theta (eta) and make rotations in phi each step (i.e. phi nested in theta)
-      for (int iTheta=0; iTheta<2*nThetaBarrel+1; iTheta++) {
-
+      for (int iTheta=0; iTheta<2*nThetaBarrel+2; iTheta++) {
+        if (iTheta == nThetaBarrel) continue;
         double thC =thetaSizeEndcap+(iTheta*dThetaBarrel);
 
         // Projective towers using EightPointSolids. see: https://root.cern.ch/doc/master/classTGeoArb8.html
@@ -122,8 +122,10 @@ namespace ddSCEPCAL {
         // Rotations in phi to place volumes
         for (int iPhi=0; iPhi<nPhiBarrel; iPhi++) {
 
-          auto crystalFId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1), iPhi, 1);
-          auto crystalRId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1), iPhi, 2);
+          //auto crystalFId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1), iPhi, 1);
+          auto crystalFId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) , iPhi, 1);
+          //auto crystalRId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1), iPhi, 2);
+          auto crystalRId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) , iPhi, 2);
 
           int crystalFId32=segmentation->getFirst32bits(crystalFId64);
           int crystalRId32=segmentation->getFirst32bits(crystalRId64);
@@ -149,35 +151,42 @@ namespace ddSCEPCAL {
           dd4hep::PlacedVolume crystalFp = towerAssemblyVol.placeVolume( crystalFVol, crystalFId32, Position(0,0,-Rdz/2) );
           dd4hep::PlacedVolume crystalRp = towerAssemblyVol.placeVolume( crystalRVol, crystalRId32, Position(0,0,Fdz/2) );
 
-          crystalFp.addPhysVolID("eta", nThetaBarrel-iTheta *(iTheta>nThetaBarrel?-1:1));
+          //crystalFp.addPhysVolID("eta", nThetaBarrel-iTheta *(iTheta>nThetaBarrel?-1:1));
+          crystalFp.addPhysVolID("eta", nThetaBarrel-iTheta);
           crystalFp.addPhysVolID("phi", iPhi);
           crystalFp.addPhysVolID("depth", 1);
           crystalFp.addPhysVolID("system", 1);
 
-          crystalRp.addPhysVolID("eta", nThetaBarrel-iTheta *(iTheta>nThetaBarrel?-1:1));
+          //crystalRp.addPhysVolID("eta", nThetaBarrel-iTheta *(iTheta>nThetaBarrel?-1:1));
+          crystalFp.addPhysVolID("eta", nThetaBarrel-iTheta );
           crystalRp.addPhysVolID("phi", iPhi);
           crystalRp.addPhysVolID("depth", 2);
           crystalRp.addPhysVolID("system", 1);
 
-          std::bitset<10> _eta((nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1));
+          //std::bitset<10> _eta((nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1));
+          std::bitset<10> _eta((nThetaBarrel-iTheta) );
           std::bitset<10> _phi(iPhi);
           std::bitset<3> depthF(1);
           std::bitset<3> depthR(2);
           std::bitset<32> id32F(crystalFId32);
           std::bitset<32> id32R(crystalRId32);
 
-//          VolIDs crystalFpVID = static_cast<VolIDs> crystalFp.VolIDs();
-//          VolIDs crystalRpVID = static_cast<VolIDs> crystalRp.VolIDs();
+          //VolIDs crystalFpVID = static_cast<VolIDs> crystalFp.VolIDs();
+          //VolIDs crystalRpVID = static_cast<VolIDs> crystalRp.VolIDs();
 
-//          std::cout << "B crystalF eta: " << ((nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1)) << " phi: " << iPhi << " depth: " << 1 << std::endl;
-//          std::cout << "B crystalF eta: " << _eta << " phi: " << _phi << " depth: " << depthF << std::endl;
-//          std::cout << "B crystalFId32: " << id32F << std::endl;
-//          std::cout << "B crystalF copyNum: " << crystalFp.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString( crystalFpVID ) << std::endl;
+          //std::cout << "B crystalF eta: " << ((nThetaBarrel-iTheta) ) << " phi: " << iPhi << " depth: " << " 1 " << std::endl;
+          //std::cout << "B crystalF eta: " << _eta << " phi: " << _phi << " depth: " << depthF << std::endl;
+          //std::cout << "B crystalF eta: " << segmentation->Eta(crystalFId64) << " phi: " << segmentation->Phi(crystalFId64) << " depth: " << depthF << std::endl;
+          //std::cout << "B crystalFId32: " << id32F << std::endl;
+          //std::cout << "B crystalF copyNum: " <<  crystalFId32 << std::endl;
+          //std::cout << "B crystalF copyNum: " <<  crystalFId64 << std::endl;
+          //std::cout << "B crystalR copyNum: " << crystalRp.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString( crystalRpVID ) << std::endl;
 
-//          std::cout << "B crystalR eta: " << ((nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1)) << " phi: " << iPhi << " depth: " << 2 << std::endl;
-//          std::cout << "B crystalR eta: " << _eta << " phi: " << _phi << " depth: " << depthR << std::endl;
-//          std::cout << "B crystalRId32: " << id32R << std::endl;
-//          std::cout << "B crystalR copyNum: " << crystalRp.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString( crystalRpVID ) << std::endl;
+          //std::cout << "B crystalR eta: " << ((nThetaBarrel-iTheta) ) << " phi: " << iPhi << " depth: " << " 2 " << std::endl;
+          //std::cout << "B crystalR eta: " << _eta << " phi: " << _phi << " depth: " << depthR << std::endl;
+          //std::cout << "B crystalRId32: " << id32R << std::endl;
+          //std::cout << "B crystalR copyNum: " <<  crystalRId32 << std::endl;
+          //std::cout << "B crystalR copyNum: " << crystalRp.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString( crystalRpVID ) << std::endl;
         }
       }
 
@@ -310,25 +319,25 @@ namespace ddSCEPCAL {
 
 
 
-//          std::cout << "E crystalF eta: " << (nThetaBarrel+nThetaEndcap-iTheta) << " phi: " << iPhi << " depth: " << 1 << std::endl;
-//          std::cout << "E crystalF eta: " << _eta << " phi: " << _phi << " depth: " << depthF << std::endl;
-//          std::cout << "E crystalFId32: " << id32F << std::endl;
-//          std::cout << "E crystalF copyNum: " << crystalFp.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString( crystalFp.VolIDs()) << std::endl;
+          //std::cout << "E crystalF eta: " << (nThetaBarrel+nThetaEndcap-iTheta) << " phi: " << iPhi << " depth: " << 1 << std::endl;
+          //std::cout << "E crystalF eta: " << _eta << " phi: " << _phi << " depth: " << depthF << std::endl;
+          //std::cout << "E crystalFId32: " << id32F << std::endl;
+          //std::cout << "E crystalF copyNum: " << crystalFp.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString( crystalFp.VolIDs()) << std::endl;
 
-//          std::cout << "E crystalR eta: " << (nThetaBarrel+nThetaEndcap-iTheta) << " phi: " << iPhi << " depth: " << 2 << std::endl;
-//          std::cout << "E crystalR eta: " << _eta << " phi: " << _phi << " depth: " << depthR << std::endl;
-//          std::cout << "E crystalRId32: " << id32R << std::endl;
-//          std::cout << "E crystalR copyNum: " << crystalRp.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString( crystalRp.VolIDs()) << std::endl;
+          //std::cout << "E crystalR eta: " << (nThetaBarrel+nThetaEndcap-iTheta) << " phi: " << iPhi << " depth: " << 2 << std::endl;
+          //std::cout << "E crystalR eta: " << _eta << " phi: " << _phi << " depth: " << depthR << std::endl;
+          //std::cout << "E crystalRId32: " << id32R << std::endl;
+          //std::cout << "E crystalR copyNum: " << crystalRp.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString( crystalRp.VolIDs()) << std::endl;
 
-//          std::cout << "E crystalF1 eta: " << -(nThetaBarrel+nThetaEndcap-iTheta) << " phi: " << iPhi << " depth: " << 1 << std::endl;
-//          std::cout << "E crystalF1 eta: " << _eta1 << " phi: " << _phi << " depth: " << depthF << std::endl;
-//          std::cout << "E crystalFId321: " << id32F1 << std::endl;
-//          std::cout << "E crystalF1 copyNum: " << crystalFp1.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString(crystalFp1.VolIDs()) << std::endl;
+          //std::cout << "E crystalF1 eta: " << -(nThetaBarrel+nThetaEndcap-iTheta) << " phi: " << iPhi << " depth: " << 1 << std::endl;
+          //std::cout << "E crystalF1 eta: " << _eta1 << " phi: " << _phi << " depth: " << depthF << std::endl;
+          //std::cout << "E crystalFId321: " << id32F1 << std::endl;
+          //std::cout << "E crystalF1 copyNum: " << crystalFp1.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString(crystalFp1.VolIDs()) << std::endl;
 
-//          std::cout << "E crystalR1 eta: " << -(nThetaBarrel+nThetaEndcap-iTheta) << " phi: " << iPhi << " depth: " << 2 << std::endl;
-//          std::cout << "E crystalR1 eta: " << _eta1 << " phi: " << _phi << " depth: " << depthR << std::endl;
-//          std::cout << "E crystalRId321: " << id32R1 << std::endl;
-//          std::cout << "E crystalR1 copyNum: " << crystalRp1.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString(crystalRp1.VolIDs()) << std::endl;
+          //std::cout << "E crystalR1 eta: " << -(nThetaBarrel+nThetaEndcap-iTheta) << " phi: " << iPhi << " depth: " << 2 << std::endl;
+          //std::cout << "E crystalR1 eta: " << _eta1 << " phi: " << _phi << " depth: " << depthR << std::endl;
+          //std::cout << "E crystalRId321: " << id32R1 << std::endl;
+          //std::cout << "E crystalR1 copyNum: " << crystalRp1.copyNumber() << " VolIDs: " << dd4hep::detail::tools::toString(crystalRp1.VolIDs()) << std::endl;
         }
 
 
