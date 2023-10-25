@@ -70,11 +70,11 @@ namespace DDSegmentation {
             double dPhi=2*M_PI/nPhi;
 
             int nTheta = nEta_in>0 ? (nThetaBarrel+nThetaEndcap)-nEta_in : -((nThetaBarrel+nThetaEndcap)+nEta_in);
-            std::cout << "This is nEta_in :: " << nEta_in << std::endl;
-            std::cout << "So this is nTheta :: " << nTheta << std::endl;
+            //std::cout << "This is nEta_in :: " << nEta_in << std::endl;
+            //std::cout << "So this is nTheta :: " << nTheta << std::endl;
             double thC=nTheta*dTheta;
 
-            std::cout << "So this is thC :: " << nTheta*dTheta << std::endl;
+            //std::cout << "So this is thC :: " << nTheta*dTheta << std::endl;
             double phi=nPhi_in*dPhi;
 
             double r0=EBz/cos(thC);
@@ -88,9 +88,9 @@ namespace DDSegmentation {
             double z= thC>0 ? R*cos(thC):-R*cos(thC);
 
             
-            std::cout << "And finally R :: " << R << std::endl;
-            std::cout << "And finally cos :: " << cos(thC) << std::endl;
-            std::cout << "And finally Z :: " << z << std::endl;
+            //std::cout << "And finally R :: " << R << std::endl;
+            //std::cout << "And finally cos :: " << cos(thC) << std::endl;
+            //std::cout << "And finally Z :: " << z << std::endl;
             Vector3D position(x, y, z);
             fPositionOf.emplace(copyNum,position);
           }
