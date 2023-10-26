@@ -205,8 +205,10 @@ namespace ddSCEPCAL {
 
         // Skip crystals at low theta (near the beampipe) if the crystal face aspect ratio is over 15% of unity
         double centralHalfWidthActual = RinEndcap*sin(dPhiEndcap/2);
-
-        if (abs(1-y0/centralHalfWidthActual)>0.15) {continue;}
+        //std::cout << "For theta " << nThetaBarrel+nThetaEndcap-iTheta <<  ", crystal face aspect ratio " << abs(1-y0/centralHalfWidthActual) << std::endl;
+        if (abs(1-y0/centralHalfWidthActual)>0.14) { // changed to 14, since aspect ratio of first tower (42/-42) is 14.9
+          //std::cout << " More than 14% --> SKIPPING ... " << std::endl;
+          continue;}
 
         double x0y0 = (r0*cos(thC) +y0*sin(thC)) *tan(thC -dThetaEndcap/2.) *tan(dPhiEndcap/2.);
         double x1y0 = (r0*cos(thC) -y0*sin(thC)) *tan(thC +dThetaEndcap/2.) *tan(dPhiEndcap/2.);
