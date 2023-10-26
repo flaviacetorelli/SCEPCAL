@@ -74,7 +74,7 @@ namespace ddSCEPCAL {
       double dPhiBarrel   =2*M_PI/nPhiBarrel;
 
       // Make towers along theta (eta) and make rotations in phi each step (i.e. phi nested in theta)
-      for (int iTheta=0; iTheta<2*nThetaBarrel+2; iTheta++) {
+      for (int iTheta=0; iTheta<2*nThetaBarrel+1; iTheta++) {
         if (iTheta == nThetaBarrel) continue;
         double thC =thetaSizeEndcap+(iTheta*dThetaBarrel);
 
@@ -122,9 +122,7 @@ namespace ddSCEPCAL {
         // Rotations in phi to place volumes
         for (int iPhi=0; iPhi<nPhiBarrel; iPhi++) {
 
-          //auto crystalFId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1), iPhi, 1);
           auto crystalFId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) , iPhi, 1);
-          //auto crystalRId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1), iPhi, 2);
           auto crystalRId64=segmentation->setVolumeID(1, (nThetaBarrel-iTheta) , iPhi, 2);
 
           int crystalFId32=segmentation->getFirst32bits(crystalFId64);
@@ -151,19 +149,16 @@ namespace ddSCEPCAL {
           dd4hep::PlacedVolume crystalFp = towerAssemblyVol.placeVolume( crystalFVol, crystalFId32, Position(0,0,-Rdz/2) );
           dd4hep::PlacedVolume crystalRp = towerAssemblyVol.placeVolume( crystalRVol, crystalRId32, Position(0,0,Fdz/2) );
 
-          //crystalFp.addPhysVolID("eta", nThetaBarrel-iTheta *(iTheta>nThetaBarrel?-1:1));
           crystalFp.addPhysVolID("eta", nThetaBarrel-iTheta);
           crystalFp.addPhysVolID("phi", iPhi);
           crystalFp.addPhysVolID("depth", 1);
           crystalFp.addPhysVolID("system", 1);
 
-          //crystalRp.addPhysVolID("eta", nThetaBarrel-iTheta *(iTheta>nThetaBarrel?-1:1));
           crystalFp.addPhysVolID("eta", nThetaBarrel-iTheta );
           crystalRp.addPhysVolID("phi", iPhi);
           crystalRp.addPhysVolID("depth", 2);
           crystalRp.addPhysVolID("system", 1);
 
-          //std::bitset<10> _eta((nThetaBarrel-iTheta) *(iTheta>nThetaBarrel?-1:1));
           std::bitset<10> _eta((nThetaBarrel-iTheta) );
           std::bitset<10> _phi(iPhi);
           std::bitset<3> depthF(1);
