@@ -75,7 +75,7 @@ namespace DDSegmentation {
             double dTheta=(M_PI/2)/(nThetaBarrel+nThetaEndcap);
             double dPhi=2*M_PI/nPhi;
 
-            int nTheta = nEta_in; //>0 ? (nThetaBarrel+nThetaEndcap)-nEta_in : -((nThetaBarrel+nThetaEndcap)+nEta_in);
+            int nTheta = nEta_in >0 ? (nThetaBarrel+nThetaEndcap)-nEta_in : -((nThetaBarrel+nThetaEndcap)+nEta_in);
             double thC=nTheta*dTheta;
 
             double phi=nPhi_in*dPhi;
