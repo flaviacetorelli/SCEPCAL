@@ -153,8 +153,8 @@ namespace ddSCEPCAL {
           crystalFp.addPhysVolID("phi", iPhi);
           crystalFp.addPhysVolID("depth", 1);
           crystalFp.addPhysVolID("system", 1);
-
-          crystalFp.addPhysVolID("eta", nThetaBarrel-iTheta );
+          
+          crystalRp.addPhysVolID("eta", nThetaBarrel-iTheta );
           crystalRp.addPhysVolID("phi", iPhi);
           crystalRp.addPhysVolID("depth", 2);
           crystalRp.addPhysVolID("system", 1);
